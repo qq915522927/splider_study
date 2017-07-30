@@ -9,35 +9,6 @@ from Queue import Queue
 CRAWL_EXIT = False
 PARSE_EXIT = False
 
-
-# url = 'https://www.qiushibaike.com/text/page/1/'
-#
-# headers = {
-#     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'}
-#
-# request = urllib2.Request(url,headers=headers)
-#
-# html = urllib2.urlopen(request).read()
-#
-# text = etree.HTML(html)
-#
-# #创建 模糊查询的根节点，包含每条段子的全部信息
-# node_list = text.xpath('//div[contains(@id,"qiushi_tag")]')
-#
-# items = {}
-# for node in node_list:
-#     #内容,取出标签下的内容 第一个标签 text
-#     content = node.xpath('.//div[@class="content"]/span')[0].text
-#
-#     #用户名
-#     try:
-#         username = node.xpath('./div[1]/a[2]/h2')[0].text
-#     except:
-#         print '没有用户'
-#     items ={'username':username,
-#      'content':content}
-#     with open("qiushi.json","a+") as f:
-#         f.write(json.dumps(items,ensure_ascii=False).encode('utf8')+'\n')
 class ThreadCrawl(Thread):
     def __init__(self, threadName, pageQueue, dataQueue):
         super(ThreadCrawl, self).__init__()
@@ -48,6 +19,7 @@ class ThreadCrawl(Thread):
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'}
 
     def run(self):
+        print '%s启动' %self.threadName
         while not CRAWL_EXIT:
             try:
                 # 默认block为true，当队列空时堵塞，直到有新的元素加入队列
@@ -68,6 +40,7 @@ class ThreadParse(Thread):
         self.fileName = fileName
 
     def run(self):
+        print '%s启动' %self.parseName
         while not PARSE_EXIT:
             try:
                 html = self.dataQueue.get(False)
@@ -142,6 +115,8 @@ def main():
     for thread in prase_thread:
         thread.join()
         print('写入完成')
+
+    fileName.close()
 
 
 if __name__ == '__main__':
